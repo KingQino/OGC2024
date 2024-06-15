@@ -82,7 +82,7 @@ The two orders in the example have two pickup locations and two delivery points.
 
 The distances between pickup and delivery locations are as follows:
 
-![distance-graph](/Users/yhq/Desktop/OGC2024/pic/distance-graph.png)
+![distance-graph](pic/distance-graph.png)
 
 To bundle the two orders, two constraints must be met.
 
@@ -103,7 +103,7 @@ To satisfy the time constraint, the delivery personnel must:
 
 Let's consider a scenario where the delivery is performed in the following order using a motorcycle:
 
-![a-delivery-example](/Users/yhq/Desktop/OGC2024/pic/delivery-example.png)
+![a-delivery-example](pic/delivery-example.png)
 
 Arc Numbers Represent Travel Time of the Motorcycle
 
