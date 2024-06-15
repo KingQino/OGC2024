@@ -183,7 +183,7 @@ checked_solution['prob_file'] = problem_file
 
 In particular, the `solution_check(K, ALL_ORDERS, ALL_RIDERS, DIST, solution)` command checks if the solution of the algorithm is valid by satisfying all the constraints, and if not, provides a simple reason why. Check out the function code in `util.py` for the detailed process of checking the validity of a solution!
 
-```json
+```python
 {'total_cost': 573047.2,
  'avg_cost': 5730.472,
  'num_drivers': 50,
