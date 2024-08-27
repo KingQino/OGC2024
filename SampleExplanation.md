@@ -36,7 +36,7 @@ Conda is a program that creates virtual environments. It can be installed via [A
 
 > Learn what Conda is and why you need it here!
 
-[Ogc2024_env.yml]()
+[Ogc2024_env.yml](baseline/ogc2024_env.yml)
 
 1. download the above file and save it to a random folder. 
 2. navigate to the folder you saved.
@@ -50,11 +50,15 @@ Conda is a program that creates virtual environments. It can be installed via [A
 
 5. You're done setting up the environment when your Terminal or cmd window looks like this
 
-[baseline_20240517.zip]()
 
-[alg_test_problems_20240429.zip]()
+
+[baseline_20240517.zip](baseline/baseline_20240720.zip)
+
+[alg_test_problems_20240429.zip](baseline/alg_test_problems_20240429.zip)
 
 First, get the above two files and unzip them in a suitable folder: `baseline_2024XXXX.zip` is a compressed file of the algorithm example code and `alg_test_problems_2024XXXX.zip` is an example problem to run the baseline code.
+
+>  `baseline_2024XXXX.zip` and `alg_test_problems_2024XXXX.zip` may be updated from time to time due to bug fixes in the code! Check for the latest version periodically!
 
 > alg_test_problems_2024XXXX.zip is not a preliminary problem! Problems for each phase (prelims, finals, etc.) are released at the beginning of each phase!
 
@@ -70,16 +74,53 @@ The `baseline` folder contains the following files.
 
 
 
+First, let's take a look at the `myalgorithm.py` file. 
+
+```python
+from util import *
+
+
+def algorithm(K, all_orders, all_riders, dist_mat, timelimit=60):
+
+    start_time = time.time()
+
+    for r in all_riders:
+        r.T = np.round(dist_mat/r.speed + r.service_time)
+
+    # A solution is a list of bundles
+    solution = []
+
+    #------------- Custom algorithm code starts from here --------------#
+		...
+    #------------- End of custom algorithm code --------------#
+
+
+
+    return solution
+```
+
+The `algorithm()` function is called with the following parameters
+
 - `K`: the number of orders
 - `all_riders`: list of delivery drivers
 - `dist_mat`: distance matrix
 - `timelimit`: algorithm execution time in seconds. Within this time, the algorithm should end its execution.
 
+`#------------- Custom algorithm code starts from here --------------#`
+
 and
+
+`#------------- End of custom algorithm code --------------#`
+
+in between. Given `K`, `all_orders`, `all_riders`, `dist_mat`, and `timelimit`, the algorithm should find a solution. 
 
 > 💡 The baseline code contains a very simple example algorithm. In the actual submission, this part should be replaced with your team's algorithm code!
 
 > 💡 You are allowed to use or modify the baseline code, but we do not recommend submitting it as is ⇒ You can submit once per day, so please do not submit meaningless algorithms!
+
+> 💡The name of the file `myalgorithm.py` and the function `def algorithm(K, all_orders, all_riders, dist_mat, timelimit=60):` never change the name!
+
+The solution must have the following structure 
 
 - Returns a list of `[delivery person type, restaurant visit order, customer visit order]` for a given problem
   - The visit order is defined as the order of the order IDs, such as order `[1,3,2]`.
