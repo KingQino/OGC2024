@@ -2,6 +2,19 @@
 
 ## 0. Terminology
 
+- Delivery driver (rider)
+    - A person who picks up delivery food from a store and delivers it to the customer who ordered it.
+- pickup
+    - A customer's order is taken over by a store.
+- delivery
+    - A customer's order that is picked up at a store and delivered to the customer's requested location.
+- readytime
+    - The time that the customer's order is ready = the time that the customer places the order (OT) + the time that the order is ready in store (RT)
+- Delivery deadline - DT
+    - The deadline by which the delivery must be made to the customer. Before this time, the delivery driver must reach the customer and complete the delivery of the order.
+- bundle delivery
+    - Bundling multiple orders together and delivering them all at once by a single delivery driver.
+
 ## 1. Problem Situation
 
 #### 1.1. Orders
@@ -22,7 +35,11 @@ However, to bundle orders for delivery, various constraints need to be considere
 
 #### 1.2. Delivery Personnel
 
-There are three types of delivery personnel. Each type has different delivery capacity, speed, service time, and cost. For example,
+There are three types of delivery personnel. 
+
+<img src="pic/023-delivery-courier.png" alt="walk" style="zoom:33%;" /><img src="pic/002-delivery-bike-1.png" alt="bike" style="zoom:33%;" /><img src="pic/022-car.png" alt="car" style="zoom:33%;" />
+
+Each type has different delivery capacity, speed, service time, and cost. For example,
 
 - Walking delivery personnel are the slowest but the cheapest for the delivery company to pay.
 - Motorcycle delivery personnel are the fastest but cost the most.
@@ -173,7 +190,7 @@ Once the type of delivery personnel and the visit order are determined for each 
 
 The data for each problem includes the following:
 
-- **K orders list.**
+- **`K` orders list.**
 - **Types and characteristics of delivery personnel.**
 - **Distance matrix.**
 
@@ -225,14 +242,62 @@ The problem data is provided in JSON format with the following fields:
 ```
 
 - **name:** Problem name
+
 - **K:** Number of orders
 
-## 5. Algorithm's Solution
+- **RIDERS**: information about the delivery person, e.g. `[“bike”, 5.291005291005291, 100, 80, 2200, 120, 5]`
+
+  - Type: `BIKE`, `WALK`, or `CAR` → `“BIKE”`
+  - Speed: distance (m)/time (sec) → `5.291005291005291`
+  - Capacity → `100`
+  - Variable cost (per 100 meters) → `80`
+  -  Fixed cost → 2200
+  - Approach time (seconds) → `120`
+  - Availability of couriers → `5`
+
+  > There will always be the same number of avaiable cars as the number of orders, which means that it is always possible to deliver all orders one by one by the vehicle without bundling them! Of course, this is not good for the cost!
+
+- **ORDERS**: order information e.g. `[0, 7, 37.49493567, 127.03071274, 37.501853, 127.037541, 900, 40, 1980]`
+
+    - Order ID → `0`
+    - Order time (in seconds) → `7`
+    - pickup location latitude coordinates → `37.49493567`
+    - Pickup location longitude coordinates → `127.03071274`
+    - Delivery Location Latitude Coordinates → `37.501853`
+    - Delivery location longitude coordinates → `127.037541`
+    - Order preparation time (in seconds): *PICKUP's READYTIME* → `900`, if you add the time of order creation to the time of food preparation.
+    - volume of the order → `40`
+    - delivery deadline (in seconds) → `1980`
+
+- **DIST**: Distance matrix
+
+    - `2K * 2K` matrix
+    - m units (rounded to whole numbers)
+    - e.g., Distance between pickup location of order `i` and pickup location of order `j` = `DIST[i,j]`
+    - e.g., Distance between pickup location of order `i` and delivery location of order `j` = `DIST[i,j+K]`
+    - e.g., Distance between the delivery location of order `i` and the delivery location of order `j` = `DIST[i+K,j+K]`
+
+    > Note: Travel time is not given separately, but is calculated using the courier speed and distance.
+    > You can use any integer value rounded to the nearest second! Service time can be added to the travel time to account for access time
+    >
+    > e.g., Python travel time conversion
+    >
+    > ```python
+    > rider.T = np.round(dist_mat/rider.speed + rider.service_time)
+    > ```
+
+    
+
+5. Algorithm's Solution
 
 The algorithm should return the following solution for the given problem data:
 
 - **A list of [type of delivery personnel, visit order of restaurants, visit order of customers] for each bundle delivery.**
 - **The order of visits is defined by the order of the order IDs, such as order [1,3,2].**
+- e.g., `[“BIKE”, [1,3,2], [2,3,1]]`
+  - Explanation: the bundle of orders 1,2,3 together and assign them to a motorcycle delivery person, visit pickup locations in the order 1,3,2 and delivery locations in the order 2,3,1.
+  - Bike: P<sub>1</sub> → P<sub>3</sub> → P<sub>2</sub> → D<sub>2</sub> → D<sub>3</sub>  → D<sub>1</sub> 
+
 
 The evaluation system will verify whether the constraints are met. The submitted solution must satisfy Constraints 1, 2, and 3 for each bundle delivery, and Constraints 4 and 5 for the entire set of bundle deliveries.
 
@@ -275,6 +340,27 @@ This means that just before the end of the phase, be sure to resubmit your best 
 
 The hidden evaluation questions will consist of questions with similar characteristics to the open questions. The number of evaluation questions in each phase will vary. For example, suppose five teams submitted algorithms and there were three hidden evaluation questions, and the results of solving the hidden questions were as follows 
 
+- `TEAM00`
+  - `prob1: obj=60, feasible`
+  - `prob2: obj=121, feasible`
+  - `prob3: obj=82, feasible`
+- `TEAM01`
+  - `prob1: obj=104, infeasible`
+  - `prob2: obj=223, feasible`
+  - `prob3: obj=95, feasible`
+- `TEAM02`
+  - `prob1: obj=141, feasible`
+  - `prob2: obj=125, feasible`
+  - `prob3: obj=102, feasible`
+- `TEAM03`
+  - `prob1: obj=80, feasible`
+  - `prob2: obj=136, feasible`
+  - `prob3: obj=129, feasible`
+- `TEAM04`
+  - `prob1: obj=183, feasible`
+  - `prob2: obj=210, feasible`
+  - `prob3: obj=54, feasible`
+
 The above result is the result of the evaluation system solving the submitted algorithms against the hidden problems. Depending on the problem, we can also determine whether it is infeasible or not. Then, for problem $p$, we can calculate the following values
 $$
 nb_p = |\text{Team that found a better objective function for problem $p$} |
@@ -288,7 +374,7 @@ $$
 
 > If the algorithm is infeasible to solve, times out, crashes, etc., you get a penalty score (-1) for that problem!
 
-Where $R$ is the number of teams you're evaluating. Points are calculated for every question and rankings are determined based on the point totals. The table below shows the leaderboard for the example above.
+Where $R$ is the problem number of teams you're evaluating. Points are calculated for every question and rankings are determined based on the point totals. The table below shows the leaderboard for the example above.
 
 | team   | nb_prob1 | p_prob1 | nb_prob3 | p_prob3 | nb_prob2 | p_prob2 | total_score | ranking |
 | ------ | -------- | ------- | -------- | ------- | -------- | ------- | ----------- | ------- |
@@ -298,11 +384,15 @@ Where $R$ is the number of teams you're evaluating. Points are calculated for ev
 | TEAM03 | 1        | 4       | 4        | 1       | 2        | 3       | 8           | 4       |
 | TEAM01 | 5        | -1      | 2        | 3       | 4        | 1       | 3           | 5       |
 
+### About numerical error when comparing objective functions (updated on 2024-07-15)
+
+When comparing objective functions, round to the third decimal place. For example, if two objective function values are 100.122999997 and 100.123, they are rounded to 100.12 and 100.12, and are therefore accepted as the same objective function. The reason for this is to account for possible miscalculations when calculating the objective function value of the solution returned by the algorithm. (*The evaluation server will be updated to use these criteria as of 2024-07-15, so leaderboard scores after 2024-07-15 may be slightly different than before)*
+
 ### How the final presentation evaluation is reflected
 
 Teams that advance to the final stage will be evaluated on their presentations. Presentations are ranked based on the presentation evaluation, which is reflected in the ranking in the form of additional evaluation questions. For example, if there are 9 hidden questions in the final stage, points are calculated for 9 evaluation questions in the same way as above, and the ranking from the last evaluation becomes the points for a hypothetical 10th hidden evaluation question, and the final ranking is determined by the sum of the points from the 10 questions (9 evaluation questions + presentation ranking).
 
-💡 **The results of the final presentation are included in the ranking calculation in the same way as the hidden assessment questions. The number of hidden assessment questions per phase will be revealed at the beginning of each phase!
+>  💡 **The results of the final presentation are included in the ranking calculation in the same way as the hidden assessment questions. The number of hidden assessment questions per phase will be revealed at the beginning of each phase!
 
 
 ### Check algorithm source code for plagiarism
